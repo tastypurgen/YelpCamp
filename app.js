@@ -38,6 +38,6 @@ app.get('/campgrounds/new', (req, res) => {
 	res.render('new');
 });
 
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3000, () => {
 	console.log('The YelpCamp is started...');
 }); 
