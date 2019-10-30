@@ -1,41 +1,75 @@
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
+const express     = require('express'),
+			 app        = express(),
+			 bodyParser = require('body-parser'),
+			 mongoose  = require('mongoose');
+
+
+// mongooose.connect('mongodb://localhost/yelp_camp'); //old
+// mongoose.set('useNewUrlParser', true);
+// mongoose.set('useFindAndModify', false);
+// mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
+mongoose.connect("mongodb://localhost:27017/yelpcamp", { useNewUrlParser: true } );
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 
 
-let campgrounds = [
-	{name: 'Pinsk Resort', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Trailer_Camping_Marmora_KOA_May_2006.jpg/220px-Trailer_Camping_Marmora_KOA_May_2006.jpg'},
-	{name: 'Heaven Spa', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Unidentified_group_of_men_camping.jpg/220px-Unidentified_group_of_men_camping.jpg'},		
-	{name: 'Bright landscape', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Thomas_Hiram_Holding.jpg/220px-Thomas_Hiram_Holding.jpg'},
-	{name: 'Pinsk Resort', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Trailer_Camping_Marmora_KOA_May_2006.jpg/220px-Trailer_Camping_Marmora_KOA_May_2006.jpg'},
-	{name: 'Heaven Spa', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Unidentified_group_of_men_camping.jpg/220px-Unidentified_group_of_men_camping.jpg'},
-	{name: 'Pinsk Resort', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Trailer_Camping_Marmora_KOA_May_2006.jpg/220px-Trailer_Camping_Marmora_KOA_May_2006.jpg'},
-	{name: 'Heaven Spa', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Unidentified_group_of_men_camping.jpg/220px-Unidentified_group_of_men_camping.jpg'},
-	{name: 'Pinsk Resort', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Trailer_Camping_Marmora_KOA_May_2006.jpg/220px-Trailer_Camping_Marmora_KOA_May_2006.jpg'},
-	{name: 'Heaven Spa', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Unidentified_group_of_men_camping.jpg/220px-Unidentified_group_of_men_camping.jpg'},
-];
+
+// SCHEMA SETUP
+var campgroundSchema = new mongoose.Schema({
+	name: String,
+	img: String,
+	description: String
+});
+														 //collection name
+var Campground = mongoose.model('Campground', campgroundSchema);
+
+//  Campground.create(
+// 	{
+// 		name: 'Batumi Rest', 
+// 		img: 'https://georgiantour.com/wp-content/uploads/2015/03/2bdc239f8dc96232f09f8d2de4db0ea3-1-750x400.jpg',
+// 		description: 'This is a decription of Batumi'
+// 	}, (err, Campground) => {
+// 		err ? console.log(err) : console.log(Campground);
+// 	}
+//  );
+
 
 app.get('/', (req, res) => {
 	res.render('landing');
 });
 
 app.get('/campgrounds', (req, res) => {
-	res.render('campgrounds', {campgrounds:campgrounds});
+	// Get all camps from DB
+	Campground.find({}, (err, allCamps) => {
+		err ? console.log(err) : res.render('index', {campgrounds:allCamps});
+	});
 });
 
 app.post('/campgrounds', (req, res) => {
 console.log(req.body);
-	let newCamp = {name: req.body.name, img: req.body.img};
-	campgrounds.push(newCamp);
-
-	res.redirect('/campgrounds');
+	let newCamp = {name: req.body.name, img: req.body.img, description: req.body.description};
+	Campground.create(
+		{
+			name: newCamp.name,
+			img: newCamp.img,
+			description: newCamp.description
+		}, (err, Campground) => {
+				err ? console.log(err) : console.log(Campground);
+				res.redirect('/campgrounds');
+		}
+	);
 }); 
 
 app.get('/campgrounds/new', (req, res) => {
 	res.render('new');
+});
+
+app.get('/campgrounds/:id', (req, res) => {
+	Campground.findById(req.params.id, (err, foundCamp) => {
+		err ? console.log(err) : res.render('show', {campground: foundCamp});
+	});
 });
 
 app.listen(process.env.PORT || 3000, () => {
