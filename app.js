@@ -1,15 +1,17 @@
-const express     = require('express'),
-			 app        = express(),
-			 bodyParser = require('body-parser'),
-			 mongoose  = require('mongoose');
+const express    = require('express'),
+			app        = express(),
+			bodyParser = require('body-parser'),
+			mongoose   = require('mongoose'),
+			Campground = require('./models/campground'),
+			seedDB     = require('./seeds');
 
-
+			seedDB();
 // mongooose.connect('mongodb://localhost/yelp_camp'); //old
 // mongoose.set('useNewUrlParser', true);
 // mongoose.set('useFindAndModify', false);
 // mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
-mongoose.connect("mongodb://localhost:27017/yelpcamp", { useNewUrlParser: true } );
+mongoose.connect("mongodb://localhost:27017/yelpcamp", {useNewUrlParser: true});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
@@ -17,13 +19,6 @@ app.set('view engine', 'ejs');
 
 
 // SCHEMA SETUP
-var campgroundSchema = new mongoose.Schema({
-	name: String,
-	img: String,
-	description: String
-});
-														 //collection name
-var Campground = mongoose.model('Campground', campgroundSchema);
 
 //  Campground.create(
 // 	{
