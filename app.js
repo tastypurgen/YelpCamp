@@ -3,9 +3,10 @@ const express    = require('express'),
 			bodyParser = require('body-parser'),
 			mongoose   = require('mongoose'),
 			Campground = require('./models/campground'),
+			Comment    = require('./models/comment'),
 			seedDB     = require('./seeds');
 
-			seedDB();
+			// seedDB();
 // mongooose.connect('mongodb://localhost/yelp_camp'); //old
 // mongoose.set('useNewUrlParser', true);
 // mongoose.set('useFindAndModify', false);
@@ -17,20 +18,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 
 
-
-// SCHEMA SETUP
-
-//  Campground.create(
-// 	{
-// 		name: 'Batumi Rest', 
-// 		img: 'https://georgiantour.com/wp-content/uploads/2015/03/2bdc239f8dc96232f09f8d2de4db0ea3-1-750x400.jpg',
-// 		description: 'This is a decription of Batumi'
-// 	}, (err, Campground) => {
-// 		err ? console.log(err) : console.log(Campground);
-// 	}
-//  );
-
-
 app.get('/', (req, res) => {
 	res.render('landing');
 });
@@ -38,12 +25,11 @@ app.get('/', (req, res) => {
 app.get('/campgrounds', (req, res) => {
 	// Get all camps from DB
 	Campground.find({}, (err, allCamps) => {
-		err ? console.log(err) : res.render('index', {campgrounds:allCamps});
+		err ? console.log(err) : res.render('campgrounds/index', {campgrounds:allCamps});
 	});
 });
 
 app.post('/campgrounds', (req, res) => {
-console.log(req.body);
 	let newCamp = {name: req.body.name, img: req.body.img, description: req.body.description};
 	Campground.create(
 		{
@@ -58,14 +44,38 @@ console.log(req.body);
 }); 
 
 app.get('/campgrounds/new', (req, res) => {
-	res.render('new');
+	res.render('campgrounds/new');
 });
 
 app.get('/campgrounds/:id', (req, res) => {
-	Campground.findById(req.params.id, (err, foundCamp) => {
-		err ? console.log(err) : res.render('show', {campground: foundCamp});
+	Campground.findById(req.params.id).populate('comments').exec((err, foundCamp) => {
+		err ? console.log(err) : res.render('campgrounds/show', {campground: foundCamp});
 	});
 });
+
+
+// COMMENTS ROUTES
+app.get('/campgrounds/:id/comments/new', (req, res) => {
+	//find camp id
+	Campground.findById(req.params.id, (err, camp) => {
+		err ? console.log(err) : res.render('comments/new', {campground: camp});
+	});
+});
+
+app.post('/campgrounds/:id/comments', (req, res) => {
+	console.log(`${req.body.comment.author}`);
+	Campground.findById(req.params.id, (err, campground) => {
+		err ? console.log(err) : 
+		Comment.create(req.body.comment, (err, comment) => {
+			err ? console.log(err) : 
+			campground.comments.push(comment);
+			campground.save();
+			res.redirect('/campgrounds/' + campground._id);
+		});
+	});
+});
+
+
 
 app.listen(process.env.PORT || 3000, () => {
 	console.log('The YelpCamp is started...');
