@@ -13,13 +13,18 @@
 
 	<div class="col-md-9">
 		<div class="card">
-			<img class="img-fluid" src="<%= campground.img %>" alt="">
+			<img class="img-fluid" src="<%= campground.img %>" alt=""> 
 			<div class="p-2">
 				<h5 class="float-right">$9.00/night</h5>
 				<h3><a href="#"><%= campground.name %></a></h3>
 				<p><%= campground.description %></p>
 				<p><em>Submitted by <%= campground.author.username %></em></p>
-				<a class="btn btn-warning btn-sm" href="/campgrounds/<%= campground.id %>/edit">Edit</a>
+				<% if (currentUser && campground.author.id.equals(currentUser._id)) { %>
+					<a class="btn btn-warning btn-sm" href="/campgrounds/<%= campground.id %>/edit">Edit</a>
+					<form class="d-inline" action="/campgrounds/<%= campground.id %>/?_method=DELETE" method="post">
+					<input class="btn btn-danger btn-sm" type="submit" value="Delete">
+					</form>
+				<% } %>
 			</div>
 		</div>
 		<div class="card card-body card-header mt-2">

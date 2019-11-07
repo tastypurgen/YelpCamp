@@ -33,6 +33,11 @@ router.post('/', isLoggedIn, (req, res) => {
 	});
 });
 
+// EDIT
+router.get('/:comment_id/edit', (req, res) => {
+	res.send('asd')
+});
+
 function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated()) return next();
 	res.redirect('/login');
