@@ -19,6 +19,7 @@
 				<h3><a href="#"><%= campground.name %></a></h3>
 				<p><%= campground.description %></p>
 				<p><em>Submitted by <%= campground.author.username %></em></p>
+				<a class="btn btn-warning btn-sm" href="/campgrounds/<%= campground.id %>/edit">Edit</a>
 			</div>
 		</div>
 		<div class="card card-body card-header mt-2">
