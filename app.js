@@ -4,6 +4,7 @@ const express        = require('express'),
 			mongoose       = require('mongoose'),
 			passport       = require('passport'),
 			LocalStrategy  = require('passport-local'),
+			flash          = require('connect-flash'),
 			Campground     = require('./models/campground'),
 			User           = require('./models/user'),
 			Comment        = require('./models/comment'),
@@ -25,6 +26,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 
 app.use(methodOverride('_method'));
+app.use(flash());
 
 // PASSPORT CONFIGURATION
 app.use(require('express-session')({
@@ -40,6 +42,8 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use( (req, res, next) => {
 	res.locals.currentUser = req.user;
+	res.locals.error = req.flash('error');
+	res.locals.success = req.flash('success');
 	next();
 });
 
