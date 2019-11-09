@@ -19,8 +19,9 @@ const express        = require('express'),
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
+mongoose.set('useNewUrlParser', true);
 
-mongoose.connect(process.env.databaseURL, {useNewUrlParser: true});
+mongoose.connect(process.env.databaseURL);
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
