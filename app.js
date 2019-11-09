@@ -16,10 +16,11 @@ const express        = require('express'),
       commentRoutes  = require('./routes/comments');
 
 // seedDB();
-// mongoose.set('useCreateIndex', true);
+mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
-mongoose.connect("mongodb://localhost:27017/yelpcamp", {useNewUrlParser: true});
+
+mongoose.connect(process.env.databaseURL, {useNewUrlParser: true});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
